@@ -6,7 +6,7 @@ import "context"
 type AddParams struct {
 	// URL is the url of the Site.If it doesn't contain a scheme
 	// (like "http:" or "https:") it defaults to "https:"."
-	URL string
+	URL string `json:"url,omitempty"`
 }
 
 // Add adds a new Site to the list of monitored sites

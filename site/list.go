@@ -11,7 +11,7 @@ type ListResponse struct {
 // List returns the list of monitored sites as a ListResponse structure
 //
 //encore:api public method=GET path=/site
-func (s *Service) List(ctx context.Context) (*ListResponse, error) {
+func (s *Service) List(_ context.Context) (*ListResponse, error) {
 	var sites []*Site
 	if err := s.db.Find(&sites).Error; err != nil {
 		return nil, err

@@ -4,7 +4,30 @@ import (
 	"context"
 	"encore.app/site"
 	"encore.dev/storage/sqldb"
+	"golang.org/x/sync/errgroup"
 )
+
+// CheckAll checks all the availability of all sites
+//
+//encore:api public method=GET path=/checkAll
+func CheckAll(ctx context.Context) error {
+	listResponse, err := site.List(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Check up to n sites concurrently based g.SetLimit
+	g, ctx := errgroup.WithContext(ctx)
+	g.SetLimit(4)
+
+	for _, webSite := range listResponse.Sites {
+		Site := webSite
+		g.Go(func() error {
+			return check(ctx, Site)
+		})
+	}
+	return g.Wait()
+}
 
 // Check checks the availability of a site based on its ID
 //

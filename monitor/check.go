@@ -15,14 +15,20 @@ func Check(ctx context.Context, siteID int) error {
 	if err != nil {
 		return err
 	}
+
+	// Check the site
+	return check(ctx, Site)
+}
+
+func check(ctx context.Context, site *site.Site) error {
 	// Ping to the site
-	response, err := Ping(ctx, Site.URL)
+	response, err := Ping(ctx, site.URL)
 	if err != nil {
 		return err
 	}
 	// Insert the checked process
 	query := "insert into public.checks (site_id, up, checked_at) values ($1,$2,now())"
-	_, err = sqldb.Exec(ctx, query, Site.ID, response.Up)
+	_, err = sqldb.Exec(ctx, query, site.ID, response.Up)
 	if err != nil {
 		return err
 	}

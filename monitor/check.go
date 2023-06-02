@@ -3,9 +3,17 @@ package monitor
 import (
 	"context"
 	"encore.app/site"
+	"encore.dev/cron"
 	"encore.dev/storage/sqldb"
 	"golang.org/x/sync/errgroup"
 )
+
+// Check all tracked sites every n minutes
+var _ = cron.NewJob("check-all", cron.JobConfig{
+	Title:    "Check all sites",
+	Endpoint: CheckAll,
+	Every:    5 * cron.Minute,
+})
 
 // CheckAll checks all the availability of all sites
 //

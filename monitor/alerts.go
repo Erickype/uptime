@@ -21,6 +21,8 @@ var TransitionTopic = pubsub.NewTopic[*SiteTransitionEvent]("uptime-transition",
 	DeliveryGuarantee: pubsub.AtLeastOnce,
 })
 
+// publishOnTransition gets the previous state and then decides to
+// publish a TransitionTopic based whether the state has changed or not
 func publishOnTransition(ctx context.Context, site *site.Site, isUp bool) error {
 	wasUp, err := getPreviousSiteState(ctx, site.ID)
 	if err != nil {

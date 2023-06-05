@@ -51,12 +51,21 @@ func Check(ctx context.Context, siteID int) error {
 	return check(ctx, Site)
 }
 
+// check make a Ping request and then publish a transition based on the state
+// finally inserts the request in checks database
 func check(ctx context.Context, site *site.Site) error {
 	// Ping to the site
 	response, err := Ping(ctx, site.URL)
 	if err != nil {
 		return err
 	}
+
+	// Publish a pub/sub message if the site transitions from up->down or down->up
+	err = publishOnTransition(ctx, site, response.Up)
+	if err != nil {
+		return err
+	}
+
 	// Insert the checked process
 	query := "insert into public.checks (site_id, up, checked_at) values ($1,$2,now())"
 	_, err = sqldb.Exec(ctx, query, site.ID, response.Up)
